@@ -1,0 +1,316 @@
+// Vision.scss
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:wght@600;700;800&display=swap');
+
+.vision {
+  padding: 6rem 4rem;
+  background: linear-gradient(135deg, var(--lg-dark-navy) 0%, var(--lg-soft-black) 50%, var(--lg-deep-grey) 100%);
+  display: flex;
+  align-items: center;
+  gap: 5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+
+  @media (max-width: 1200px) {
+    gap: 4rem;
+  }
+
+  @media (max-width: 1024px) {
+    padding: 5rem 3rem;
+    gap: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 4rem 2rem;
+    gap: 3rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 3rem 1.5rem;
+    gap: 2.5rem;
+  }
+
+  // Decorative elements
+  &::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: floatSlow 12s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 15%;
+    right: 5%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(167, 137, 40, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: floatSlow 15s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+
+  .vision-image {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+    max-width: 550px;
+
+    @media (max-width: 768px) {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                  0 0 40px rgba(212, 175, 55, 0.2);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      position: relative;
+      filter: brightness(0.95);
+
+      &:hover {
+        transform: scale(1.05) translateY(-10px);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6),
+                    0 0 60px rgba(212, 175, 55, 0.4);
+        border-color: var(--lg-gold);
+        filter: brightness(1.05);
+      }
+    }
+
+    // Decorative corner accents
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border: 3px solid var(--lg-gold);
+      z-index: 2;
+      transition: all 0.4s ease;
+      opacity: 0.7;
+
+      @media (max-width: 480px) {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+      }
+    }
+
+    &::before {
+      top: -15px;
+      left: -15px;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 20px 0 0 0;
+    }
+
+    &::after {
+      bottom: -15px;
+      right: -15px;
+      border-left: none;
+      border-top: none;
+      border-radius: 0 0 20px 0;
+    }
+
+    &:hover::before,
+    &:hover::after {
+      opacity: 1;
+      border-color: var(--lg-gold-light);
+    }
+  }
+
+  .vision-text {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--lg-gold);
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+      line-height: 1.2;
+      text-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      position: relative;
+      display: inline-block;
+
+      @media (max-width: 1024px) {
+        font-size: 3rem;
+      }
+
+      @media (max-width: 768px) {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 2rem;
+      }
+
+      // Decorative underline
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--lg-gold), var(--lg-gold-light), transparent);
+        border-radius: 2px;
+        box-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+
+        @media (max-width: 768px) {
+          height: 3px;
+          bottom: -8px;
+        }
+      }
+
+      // Glowing accent
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -30px;
+        width: 8px;
+        height: 8px;
+        background: var(--lg-gold);
+        border-radius: 50%;
+        box-shadow: 0 0 20px var(--lg-gold);
+        animation: pulse 2s ease-in-out infinite;
+
+        @media (max-width: 768px) {
+          left: -20px;
+          width: 6px;
+          height: 6px;
+        }
+      }
+    }
+
+    .vision-paragraphs {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      @media (max-width: 768px) {
+        gap: 1.2rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        color: rgba(230, 199, 111, 0.9);
+        margin: 0;
+        text-align: justify;
+        position: relative;
+        padding-left: 1.5rem;
+        transition: all 0.3s ease;
+
+        @media (max-width: 768px) {
+          font-size: 1.05rem;
+          line-height: 1.8;
+          padding-left: 1rem;
+        }
+
+        @media (max-width: 480px) {
+          font-size: 1rem;
+          line-height: 1.7;
+          text-align: left;
+        }
+
+        // Decorative bullet
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 12px;
+          width: 6px;
+          height: 6px;
+          background: var(--lg-gold);
+          border-radius: 50%;
+          box-shadow: 0 0 10px var(--lg-gold);
+          transition: all 0.3s ease;
+
+          @media (max-width: 768px) {
+            top: 10px;
+            width: 5px;
+            height: 5px;
+          }
+        }
+
+        &:hover {
+          color: var(--lg-gold-light);
+          transform: translateX(5px);
+
+          &::before {
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 15px var(--lg-gold);
+          }
+        }
+
+        // Quote styling for first paragraph
+        &:first-child {
+          font-weight: 500;
+          color: var(--lg-gold-light);
+          font-size: 1.15rem;
+
+          @media (max-width: 768px) {
+            font-size: 1.1rem;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 1.05rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(20px, -20px) scale(1.1);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translate(-15px, 15px) scale(0.95);
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}

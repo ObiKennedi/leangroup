@@ -1,0 +1,283 @@
+// TopNav.scss
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+// Highly specific selector to avoid conflicts
+header.top-nav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--lg-dark-navy) 0%, var(--lg-soft-black) 100%);
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4),
+        0 2px 10px rgba(212, 175, 55, 0.1);
+    z-index: 999;
+    font-family: 'Montserrat', sans-serif;
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    flex-direction: row;
+
+    @media (max-width: 1024px) {
+        padding: 1rem 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        padding: 0.9rem 1rem;
+    }
+
+    // Animated bottom border
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--lg-gold), transparent);
+        animation: shimmerTopNav 3s ease-in-out infinite;
+    }
+
+    // Main layout - flex row
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+
+    @media (max-width: 1024px) {
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    // User section
+    >.user-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+
+        @media (max-width: 480px) {
+            gap: 0.8rem;
+        }
+
+        >.profile-img {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--lg-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+
+            @media (max-width: 768px) {
+                width: 45px;
+                height: 45px;
+                border-width: 2.5px;
+            }
+
+            @media (max-width: 480px) {
+                width: 42px;
+                height: 42px;
+                border-width: 2px;
+            }
+
+            >img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: all 0.3s ease;
+            }
+
+            // Glowing ring effect
+            &::before {
+                content: '';
+                position: absolute;
+                inset: -5px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--lg-gold), transparent);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+                filter: blur(8px);
+            }
+
+            &:hover {
+                transform: scale(1.1);
+                border-color: var(--lg-gold-light);
+
+                &::before {
+                    opacity: 0.7;
+                }
+
+                >img {
+                    transform: scale(1.05);
+                }
+            }
+        }
+
+        >.user-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+
+            >.greeting {
+                margin: 0;
+                font-size: 0.85rem;
+                font-weight: 500;
+                color: rgba(230, 199, 111, 0.7);
+                letter-spacing: 0.3px;
+
+                @media (max-width: 480px) {
+                    font-size: 0.8rem;
+                }
+            }
+
+            >.username {
+                margin: 0;
+                font-family: 'Playfair Display', serif;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--lg-gold-light);
+                letter-spacing: 0.5px;
+                line-height: 1.2;
+
+                @media (max-width: 768px) {
+                    font-size: 1.2rem;
+                }
+
+                @media (max-width: 480px) {
+                    font-size: 1.1rem;
+                }
+            }
+        }
+    }
+
+    // Actions section
+    >.actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+
+        @media (max-width: 768px) {
+            width: 100%;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        >.action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.3rem;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(167, 137, 40, 0.1));
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: var(--lg-gold-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+
+            @media (max-width: 1024px) {
+                padding: 0.65rem 1.1rem;
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 768px) {
+                flex: 1;
+                justify-content: center;
+                padding: 0.7rem 0.8rem;
+                gap: 0.4rem;
+            }
+
+            @media (max-width: 480px) {
+                padding: 0.65rem 0.6rem;
+                font-size: 0.85rem;
+            }
+
+            // Icon styling
+            >svg {
+                flex-shrink: 0;
+                transition: all 0.3s ease;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+
+                @media (max-width: 480px) {
+                    width: 18px;
+                    height: 18px;
+                }
+            }
+
+            // Text label
+            >span {
+                transition: all 0.3s ease;
+
+                @media (max-width: 480px) {
+                    font-size: 0.8rem;
+                }
+            }
+
+            // Shine effect overlay
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+                transition: left 0.5s ease;
+            }
+
+            &:hover {
+                background: linear-gradient(135deg, var(--lg-gold), var(--lg-gold-light));
+                border-color: var(--lg-gold);
+                color: var(--lg-dark-navy);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+
+                >svg {
+                    transform: scale(1.1);
+                    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+                }
+
+                >span {
+                    font-weight: 700;
+                }
+
+                &::before {
+                    left: 100%;
+                }
+            }
+
+            &:active {
+                transform: translateY(0);
+                box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
+            }
+        }
+    }
+}
+
+// Animations specific to TopNav
+@keyframes shimmerTopNav {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}

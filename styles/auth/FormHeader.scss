@@ -1,0 +1,32 @@
+header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    >h2 {
+        font-weight: 700;
+        font-style: Bold;
+        font-size: 1.7rem;
+        line-height: 100%;
+        letter-spacing: 0%;
+        color: var(--lg-gold);
+
+        @media (max-width: 470px) {
+            font-size: 1.5rem;
+        }
+    }
+
+    >p {
+        font-weight: 500;
+        font-size: 0.9rem;
+        font-style: Medium;
+        line-height: 100%;
+        letter-spacing: 0%;
+        color: white;
+
+        @media (max-width: 470px) {
+            font-size: 0.7rem;
+        }
+    }
+}

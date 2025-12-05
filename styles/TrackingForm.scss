@@ -1,0 +1,364 @@
+// TrackingForm.scss
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+form.tracking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+
+  >div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--lg-gold-light);
+      letter-spacing: 0.5px;
+      transition: color 0.3s ease;
+
+      @media (max-width: 480px) {
+        font-size: 0.95rem;
+      }
+    }
+
+    input {
+      padding: 1.1rem 1.3rem;
+      background: rgba(11, 26, 42, 0.6);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      color: var(--lg-gold-light);
+      font-size: 1rem;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      outline: none;
+
+      @media (max-width: 480px) {
+        padding: 1rem 1.2rem;
+        font-size: 0.95rem;
+      }
+
+      &::placeholder {
+        color: rgba(230, 199, 111, 0.5);
+        font-weight: 400;
+      }
+
+      &:focus {
+        border-color: var(--lg-gold);
+        background: rgba(11, 26, 42, 0.8);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
+          inset 0 0 10px rgba(212, 175, 55, 0.1);
+        transform: translateY(-2px);
+      }
+
+      &:hover {
+        border-color: var(--lg-gold-light);
+      }
+
+      // Autofill styling
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 1000px rgba(11, 26, 42, 0.8) inset;
+        -webkit-text-fill-color: var(--lg-gold-light);
+        border-color: var(--lg-gold);
+      }
+    }
+
+    &:focus-within label {
+      color: var(--lg-gold);
+    }
+  }
+
+  button {
+    padding: 1.1rem 2.5rem;
+    background: linear-gradient(135deg, var(--lg-gold) 0%, var(--lg-gold-dark) 100%);
+    color: var(--lg-dark-navy);
+    border: none;
+    border-radius: 50px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+
+    @media (max-width: 480px) {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+
+    // Shine effect
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.6s ease;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.02);
+      background: linear-gradient(135deg, var(--lg-gold-light) 0%, var(--lg-gold) 100%);
+      box-shadow: 0 12px 35px rgba(212, 175, 55, 0.6),
+        0 0 30px rgba(212, 175, 55, 0.3);
+    }
+
+    &:hover:not(:disabled)::before {
+      left: 100%;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  }
+
+  // Error message styling
+  >p {
+    margin: 0;
+    padding: 1rem 1.3rem;
+    background: linear-gradient(135deg, rgba(253, 33, 33, 0.1), rgba(253, 33, 33, 0.05));
+    border: 2px solid rgba(253, 33, 33, 0.3);
+    border-radius: 12px;
+    color: #ff6b6b;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    animation: slideIn 0.3s ease-out;
+
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+      padding: 0.9rem 1.1rem;
+    }
+  }
+
+  .result-box {
+    margin-top: 0.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(167, 137, 40, 0.08));
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2),
+      inset 0 0 20px rgba(212, 175, 55, 0.05);
+    animation: slideIn 0.4s ease-out;
+    position: relative;
+    overflow: hidden;
+
+    @media (max-width: 480px) {
+      padding: 1.5rem;
+    }
+
+    // Decorative corner accent
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--lg-gold), transparent);
+      opacity: 0.2;
+      border-radius: 0 15px 0 100%;
+    }
+
+    // Success icon
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: var(--lg-gold);
+      font-weight: 700;
+      animation: checkmark 0.5s ease-out 0.2s both;
+    }
+
+    p {
+      margin: 0.6rem 0;
+      color: var(--lg-gold-light);
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+
+      @media (max-width: 480px) {
+        font-size: 0.95rem;
+      }
+
+      &:first-child {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--lg-gold);
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+
+        @media (max-width: 480px) {
+          font-size: 1.2rem;
+        }
+      }
+
+      &:not(:first-child) {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding-left: 1rem;
+
+        &::before {
+          content: '•';
+          color: var(--lg-gold);
+          font-size: 1.2rem;
+          flex-shrink: 0;
+        }
+      }
+
+      strong {
+        color: var(--lg-gold);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes checkmark {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+// Add to @/styles/TrackingForm.scss
+.error-box {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #c33;
+  margin-top: 1rem;
+}
+
+.result-box {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: #0369a1;
+  }
+
+  .info-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0f2fe;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .value {
+      color: #64748b;
+      text-align: right;
+
+      &.highlight {
+        color: #0369a1;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &.status-in-transit {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    &.status-delivered {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &.status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  }
+}
