@@ -16,7 +16,7 @@ export const Footer = () => {
         <footer className="footer">
             <div className="footer-top">
                 <div className="footer-logo">
-                    <Image src="/nextpath-logo.png" alt="Logo" width={150} height={150} />
+                    <Image src="/logo.png" alt="Logo" width={150} height={150} />
                 </div>
 
                 <div className="footer-services">

@@ -32,7 +32,7 @@ export const NavBar = () => {
     return (
         <header data-aos="fade-down" className="nav-bar">
             <div className="logo" onClick={onClick}>
-                <Image src="/nextpath-logo.png" width={200} height={200} alt="logo" />
+                <Image src="/logo.png" width={200} height={200} alt="logo" />
             </div>
 
             <div className="menu-icon" onClick={() => setOpen(!open)}>
