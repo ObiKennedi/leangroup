@@ -44,21 +44,70 @@ model User {
 }
 
 model Delivery {
-  id              String         @id @default(cuid())
-  trackingId      String         @unique @default(uuid())
-  weight          Float
-  senderName      String
-  senderPhone     String
-  receiverName    String
-  receiverPhone   String
-  pickupAddress   String
-  deliveryAddress String
-  status          DeliveryStatus @default(PENDING)
-  arrivalDate     DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  userId          String
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String            @id @default(cuid())
+  trackingId         String            @unique @default(uuid())
+  weight             Float
+  senderName         String
+  senderPhone        String
+  receiverName       String
+  receiverPhone      String
+  pickupAddress      String
+  deliveryAddress    String
+  status             DeliveryStatus    @default(PENDING)
+  arrivalDate        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  userId             String
+  currentLatitude    Float?
+  currentLocation    String?
+  currentLongitude   Float?
+  currentRouteIndex  Int?
+  destinationCountry String
+  estimatedArrival   DateTime?
+  lastRouteUpdate    DateTime?
+  originCountry      String
+  packageDescription String?
+  statusReason       String?
+  transitSpeed       Float?
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routes             Route[]
+  trackingHistory    TrackingHistory[]
+}
+
+model Route {
+  id                   String    @id @default(cuid())
+  deliveryId           String
+  countryCode          String
+  countryName          String
+  cityName             String?
+  latitude             Float
+  longitude            Float
+  sequence             Int
+  isPassed             Boolean   @default(false)
+  passedAt             DateTime?
+  estimatedArrivalTime DateTime?
+  actualArrivalTime    DateTime?
+  distanceFromPrevious Float?
+  createdAt            DateTime  @default(now())
+  checkpointActivity   String?
+  delivery             Delivery  @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId, sequence])
+}
+
+model TrackingHistory {
+  id          String         @id @default(cuid())
+  deliveryId  String
+  status      DeliveryStatus
+  location    String
+  latitude    Float?
+  longitude   Float?
+  countryCode String?
+  description String?
+  timestamp   DateTime       @default(now())
+  delivery    Delivery       @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId, timestamp])
 }
 
 enum Role {
@@ -71,4 +120,7 @@ enum DeliveryStatus {
   IN_TRANSIT
   DELIVERED
   CANCELLED
+  PICKED_UP
+  CUSTOMS_CLEARANCE
+  OUT_FOR_DELIVERY
 }
