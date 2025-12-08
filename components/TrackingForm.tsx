@@ -393,210 +393,130 @@ export const TrackingForm = () => {
                         )}
 
                         {/* Animated Location Tracker */}
-                        <div className="location-tracker">
-                            <div className="tracker-header">
-                                <Navigation className="header-icon" />
-                                <h3>Live Tracking</h3>
-                                {result.delivery.status === "IN_TRANSIT" && (
-                                    <Truck className="truck-icon" />
-                                )}
+                        {/* Route Map */}
+                        {result.delivery.routes.length > 0 && (
+                            <div className="route-map-container">
+                                <div className="map-header">
+                                    <MapPin className="header-icon" />
+                                    <h3>Delivery Route Map</h3>
+                                    {result.delivery.status === "IN_TRANSIT" && (
+                                        <span className="live-badge">
+                                            <span className="live-dot"></span>
+                                            LIVE
+                                        </span>
+                                    )}
+                                </div>
+                                <canvas ref={canvasRef} className="route-canvas"></canvas>
                             </div>
+                        )}
 
-                            {/* Progress Bar */}
-                            <div className="progress-container">
-                                <div className="progress-info">
-                                    <span className="progress-label">Journey Progress</span>
-                                    <span className="progress-percentage">
-                                        {result.delivery.routeProgress.progressPercentage}%
-                                    </span>
-                                </div>
-                                <div className="progress-bar">
-                                    <div
-                                        className="progress-fill"
-                                        style={{ width: `${result.delivery.routeProgress.progressPercentage}%` }}
-                                    >
-                                        <div className="progress-glow"></div>
-                                    </div>
-                                </div>
-                                <div className="checkpoint-info">
-                                    <span>{result.delivery.routeProgress.passedCheckpoints} of {result.delivery.routeProgress.totalCheckpoints} checkpoints passed</span>
-                                </div>
-                            </div>
-
-                            {/* Current and Next Location */}
-                            <div className="locations-container">
-                                {/* Current Location */}
-                                <div className="location-card current">
-                                    <div className="location-icon">
-                                        {result.delivery.status === "IN_TRANSIT" ? (
-                                            <Truck className="icon" />
-                                        ) : (
-                                            <MapPin className="icon" />
-                                        )}
-                                        <div className="icon-pulse"></div>
-                                    </div>
-                                    <div className="location-content">
-                                        <div className="location-badge">
-                                            <CheckCircle2 className="badge-icon" />
-                                            Current Location
-                                        </div>
-                                        <h4 className="location-name">{result.delivery.currentLocation.name}</h4>
-                                        <div className="location-details">
-                                            <span className="detail-item">
-                                                📍 {result.delivery.currentLocation.country}
-                                            </span>
-                                            {result.delivery.currentLocation.city && (
-                                                <span className="detail-item">
-                                                    🏙️ {result.delivery.currentLocation.city}
-                                                </span>
-                                            )}
-                                            {result.delivery.currentLocation.coordinates && (
-                                                <span className="detail-item coords">
-                                                    {result.delivery.currentLocation.coordinates.latitude.toFixed(4)}, {result.delivery.currentLocation.coordinates.longitude.toFixed(4)}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {result.delivery.currentLocation.passedAt && (
-                                            <div className="timestamp">
-                                                <Clock className="time-icon" />
-                                                {formatDate(result.delivery.currentLocation.passedAt)}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Arrow Separator */}
-                                <div className="location-separator">
-                                    <ArrowRight className="arrow-icon" />
-                                    <div className="separator-line"></div>
-                                    {result.delivery.nextLocation.distance && (
-                                        <span className="distance-badge">
-                                            {result.delivery.nextLocation.distance.toFixed(0)} km
+                        {/* Vertical Progress Timeline */}
+                        <div className="vertical-timeline-container">
+                                <div className="timeline-header">
+                                    <Navigation className="header-icon" />
+                                    <h3>Shipment Progress</h3>
+                                    {result.delivery.status === "IN_TRANSIT" && (
+                                        <span className="live-badge">
+                                            <span className="live-dot"></span>
+                                            LIVE
                                         </span>
                                     )}
                                 </div>
 
-                                {/* Next Location */}
-                                <div className="location-card next">
-                                    <div className="location-icon">
-                                        <Package className="icon" />
-                                        <div className="icon-glow"></div>
-                                    </div>
-                                    <div className="location-content">
-                                        <div className="location-badge next-badge">
-                                            <Navigation className="badge-icon" />
-                                            Next Destination
-                                        </div>
-                                        <h4 className="location-name">{result.delivery.nextLocation.name}</h4>
-                                        <div className="location-details">
-                                            <span className="detail-item">
-                                                📍 {result.delivery.nextLocation.country}
-                                            </span>
-                                            {result.delivery.nextLocation.city && (
-                                                <span className="detail-item">
-                                                    🏙️ {result.delivery.nextLocation.city}
-                                                </span>
-                                            )}
-                                            {result.delivery.nextLocation.coordinates && (
-                                                <span className="detail-item coords">
-                                                    {result.delivery.nextLocation.coordinates.latitude.toFixed(4)}, {result.delivery.nextLocation.coordinates.longitude.toFixed(4)}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {result.delivery.nextLocation.estimatedArrivalTime && (
-                                            <div className="timestamp">
-                                                <Clock className="time-icon" />
-                                                ETA: {formatDate(result.delivery.nextLocation.estimatedArrivalTime)}
+                                <div className="vertical-timeline">
+                                    {result.delivery.routes.map((route, index) => {
+                                        const isPassed = route.isPassed;
+                                        const isCurrent = index === (result.delivery!.currentRouteIndex ?? 0);
+                                        const isLast = index === result.delivery!.routes.length - 1;
+
+                                        return (
+                                            <div key={route.id} className="timeline-step">
+                                                <div className="timeline-left">
+                                                    {/* Node/Checkpoint */}
+                                                    <div className={`timeline-node ${isPassed ? 'passed' : 'pending'} ${isCurrent ? 'current' : ''}`}>
+                                                        {isPassed && !isCurrent ? (
+                                                            <CheckCircle2 size={24} />
+                                                        ) : isCurrent ? (
+                                                            <Truck size={24} />
+                                                        ) : (
+                                                            <div className="node-circle"></div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Vertical Line */}
+                                                    {!isLast && (
+                                                        <div className={`timeline-line ${isPassed && index < (result.delivery!.currentRouteIndex ?? 0) ? 'completed' : 'incomplete'}`}></div>
+                                                    )}
+                                                </div>
+
+                                                <div className="timeline-right">
+                                                    <div className={`timeline-card ${isPassed ? 'passed' : 'pending'} ${isCurrent ? 'current' : ''}`}>
+                                                        <div className="card-header">
+                                                            <h4>{route.cityName || route.countryName}</h4>
+                                                            {isCurrent && (
+                                                                <span className="current-label">Current Location</span>
+                                                            )}
+                                                            {index === 0 && (
+                                                                <span className="origin-label">Origin</span>
+                                                            )}
+                                                            {isLast && (
+                                                                <span className="destination-label">Destination</span>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="card-details">
+                                                            <div className="detail-row">
+                                                                <MapPin size={16} />
+                                                                <span>{route.countryName} ({route.countryCode})</span>
+                                                            </div>
+
+                                                            {route.passedAt && (
+                                                                <div className="detail-row time-row">
+                                                                    <CheckCircle2 size={16} />
+                                                                    <span>{formatDate(route.passedAt)}</span>
+                                                                </div>
+                                                            )}
+
+                                                            {!route.passedAt && route.estimatedArrivalTime && (
+                                                                <div className="detail-row time-row eta">
+                                                                    <Clock size={16} />
+                                                                    <span>ETA: {formatDate(route.estimatedArrivalTime)}</span>
+                                                                </div>
+                                                            )}
+
+                                                            {route.distanceFromPrevious && index > 0 && (
+                                                                <div className="detail-row distance-row">
+                                                                    <Navigation size={16} />
+                                                                    <span>{route.distanceFromPrevious.toFixed(0)} km from previous</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        )}
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Progress Summary */}
+                                <div className="progress-summary">
+                                    <div className="summary-item">
+                                        <div className="summary-value">{result.delivery.routeProgress.passedCheckpoints}</div>
+                                        <div className="summary-label">Completed</div>
+                                    </div>
+                                    <div className="summary-divider"></div>
+                                    <div className="summary-item">
+                                        <div className="summary-value">{result.delivery.routeProgress.remainingCheckpoints}</div>
+                                        <div className="summary-label">Remaining</div>
+                                    </div>
+                                    <div className="summary-divider"></div>
+                                    <div className="summary-item highlight">
+                                        <div className="summary-value">{result.delivery.routeProgress.progressPercentage}%</div>
+                                        <div className="summary-label">Complete</div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* All Checkpoints Grid */}
-                            {result.delivery.routes.length > 0 && (
-                                <div className="checkpoints-grid">
-                                    <h4 className="checkpoints-header">
-                                        <Box className="header-icon" />
-                                        All Checkpoints ({result.delivery.routes.length})
-                                    </h4>
-                                    <div className="checkpoints-list">
-                                        {result.delivery.routes.map((route) => (
-                                            <div
-                                                key={route.id}
-                                                className={`checkpoint-card ${route.isPassed ? 'passed' : 'upcoming'} ${route.sequence === (result.delivery!.currentRouteIndex ?? 0) + 1 ? 'current' : ''
-                                                    }`}
-                                            >
-                                                <div className="checkpoint-marker">
-                                                    {route.isPassed ? (
-                                                        <CheckCircle2 className="marker-icon" />
-                                                    ) : route.sequence === (result.delivery!.currentRouteIndex ?? 0) + 1 ? (
-                                                        <Truck className="marker-icon" />
-                                                    ) : (
-                                                        <div className="marker-dot">{route.sequence}</div>
-                                                    )}
-                                                </div>
-                                                <div className="checkpoint-content">
-                                                    <div className="checkpoint-title">
-                                                        {route.cityName || route.countryName}
-                                                    </div>
-                                                    <div className="checkpoint-subtitle">
-                                                        {route.countryName} ({route.countryCode})
-                                                    </div>
-                                                    {route.passedAt && (
-                                                        <div className="checkpoint-time">
-                                                            ✓ {formatDate(route.passedAt)}
-                                                        </div>
-                                                    )}
-                                                    {!route.passedAt && route.estimatedArrivalTime && (
-                                                        <div className="checkpoint-time eta">
-                                                            ⏱ ETA: {formatDate(route.estimatedArrivalTime)}
-                                                        </div>
-                                                    )}
-                                                    {route.distanceFromPrevious && (
-                                                        <div className="checkpoint-distance">
-                                                            📏 {route.distanceFromPrevious.toFixed(0)} km from previous
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Tracking History */}
-                            {result.delivery.trackingHistory.length > 0 && (
-                                <div className="tracking-history">
-                                    <h4 className="history-header">
-                                        <Clock className="header-icon" />
-                                        Recent Updates
-                                    </h4>
-                                    <div className="history-list">
-                                        {result.delivery.trackingHistory.map((history) => (
-                                            <div key={history.id} className="history-item">
-                                                <div className="history-time">
-                                                    {formatDate(history.timestamp)}
-                                                </div>
-                                                <div className="history-content">
-                                                    <span className={`history-status ${getStatusColor(history.status)}`}>
-                                                        {history.status.replace(/_/g, ' ')}
-                                                    </span>
-                                                    <p className="history-description">
-                                                        {history.description || history.location}
-                                                    </p>
-                                                    {history.countryCode && (
-                                                        <span className="history-location">
-                                                            📍 {history.countryCode}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        )                    
                     </>
                 )}
             </form>
