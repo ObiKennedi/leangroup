@@ -392,24 +392,6 @@ export const TrackingForm = () => {
                             </div>
                         )}
 
-                        {/* Animated Location Tracker */}
-                        {/* Route Map */}
-                        {result.delivery.routes.length > 0 && (
-                            <div className="route-map-container">
-                                <div className="map-header">
-                                    <MapPin className="header-icon" />
-                                    <h3>Delivery Route Map</h3>
-                                    {result.delivery.status === "IN_TRANSIT" && (
-                                        <span className="live-badge">
-                                            <span className="live-dot"></span>
-                                            LIVE
-                                        </span>
-                                    )}
-                                </div>
-                                <canvas ref={canvasRef} className="route-canvas"></canvas>
-                            </div>
-                        )}
-
                         {/* Vertical Progress Timeline */}
                         <div className="vertical-timeline-container">
                                 <div className="timeline-header">
