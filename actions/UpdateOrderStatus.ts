@@ -222,7 +222,7 @@ export const updateOrderStatus = async (
     return { success: true, order: result };
   } catch (error) {
     console.error("Error updating order status:", error);
-    
+
     // Check if it's a Prisma error
     if (error && typeof error === 'object' && 'code' in error) {
       const prismaError = error as { code: string; message: string };
@@ -230,7 +230,7 @@ export const updateOrderStatus = async (
         return { success: false, error: "Database transaction timeout. Please try again." };
       }
     }
-    
+
     return { success: false, error: "Failed to update order status" };
   }
 };
@@ -255,12 +255,23 @@ export const updateCurrentLocation = async (
       return { success: false, error: "Order not found" };
     }
 
+    // Log the values BEFORE update
+    console.log("BEFORE UPDATE:");
+    console.log("Current:", existingOrder.currentLocation, existingOrder.currentLatitude, existingOrder.currentLongitude);
+    console.log("Origin:", existingOrder.originLocation, existingOrder.originLatitude, existingOrder.originLongitude);
+    console.log("New data:", data.location, data.latitude, data.longitude);
+
     const result = await db.$transaction(
       async (tx) => {
-        // Update delivery location
+        // Update delivery location - move current to origin, set new as current
         const updatedOrder = await tx.delivery.update({
           where: { id: orderId },
           data: {
+            // Move current location to origin
+            originLatitude: existingOrder.currentLatitude,
+            originLongitude: existingOrder.currentLongitude,
+            originLocation: existingOrder.currentLocation,
+            // Set new location as current
             currentLatitude: data.latitude,
             currentLongitude: data.longitude,
             currentLocation: data.location,
@@ -271,6 +282,11 @@ export const updateCurrentLocation = async (
             },
           },
         });
+
+        // Log the values AFTER update
+        console.log("AFTER UPDATE:");
+        console.log("Current:", updatedOrder.currentLocation, updatedOrder.currentLatitude, updatedOrder.currentLongitude);
+        console.log("Origin:", updatedOrder.originLocation, updatedOrder.originLatitude, updatedOrder.originLongitude);
 
         // Add to tracking history
         await tx.trackingHistory.create({
@@ -442,7 +458,7 @@ export const addRouteCheckpoint = async (
 
 export const updateRouteCheckpoint = async (
   routeId: string,
-  routeData: Partial<RoutePoint> & { 
+  routeData: Partial<RoutePoint> & {
     isPassed?: boolean;
     actualArrivalTime?: Date;
   }
@@ -450,7 +466,7 @@ export const updateRouteCheckpoint = async (
   try {
     // Build the update data object dynamically
     const updateData: any = {};
-    
+
     if (routeData.countryCode) updateData.countryCode = routeData.countryCode;
     if (routeData.countryName) updateData.countryName = routeData.countryName;
     if (routeData.cityName !== undefined) updateData.cityName = routeData.cityName;
@@ -458,7 +474,7 @@ export const updateRouteCheckpoint = async (
     if (routeData.longitude !== undefined) updateData.longitude = routeData.longitude;
     if (routeData.estimatedArrivalTime) updateData.estimatedArrivalTime = routeData.estimatedArrivalTime;
     if (routeData.checkpointActivity !== undefined) updateData.checkpointActivity = routeData.checkpointActivity;
-    
+
     if (routeData.isPassed !== undefined) {
       updateData.isPassed = routeData.isPassed;
       if (routeData.isPassed) {

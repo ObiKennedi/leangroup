@@ -153,7 +153,7 @@ export default function AdminOrders() {
             cityName: formData.cityName || undefined,
             latitude: parseFloat(formData.latitude),
             longitude: parseFloat(formData.longitude),
-            estimatedArrivalTime: formData.estimatedArrivalTime 
+            estimatedArrivalTime: formData.estimatedArrivalTime
                 ? new Date(formData.estimatedArrivalTime)
                 : undefined,
             checkpointActivity: formData.checkpointActivity || undefined,
@@ -174,7 +174,7 @@ export default function AdminOrders() {
             cityName: formData.cityName || undefined,
             latitude: parseFloat(formData.latitude),
             longitude: parseFloat(formData.longitude),
-            estimatedArrivalTime: formData.estimatedArrivalTime 
+            estimatedArrivalTime: formData.estimatedArrivalTime
                 ? new Date(formData.estimatedArrivalTime)
                 : undefined,
             checkpointActivity: formData.checkpointActivity || undefined,
@@ -286,15 +286,14 @@ export default function AdminOrders() {
                         <div className={styles.modalBody}>
                             {modalType === "location" && (
                                 <LocationUpdateModal
-                                    initialData={{
-                                        latitude: selectedOrder.currentLatitude?.toString() || "",
-                                        longitude: selectedOrder.currentLongitude?.toString() || "",
-                                        location: selectedOrder.currentLocation || "",
-                                        countryCode: "",
-                                        description: "",
-                                        checkpointActivity: "",
+                                    orderId={selectedOrder.id}
+                                    //currentRouteIndex={selectedOrder.currentRouteIndex || 0}
+                                    //routes={selectedOrder.routes || []}
+                                    onSubmit={() => {
+                                        // Refresh your orders list here
+                                        fetchOrders();
                                     }}
-                                    onSubmit={handleLocationSubmit}
+                                    //onClose={() => setShowLocationModal(false)}
                                 />
                             )}
 

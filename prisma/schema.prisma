@@ -44,23 +44,29 @@ model User {
 }
 
 model Delivery {
-  id                 String            @id @default(cuid())
-  trackingId         String            @unique @default(uuid())
-  weight             Float
-  senderName         String
-  senderPhone        String
-  receiverName       String
-  receiverPhone      String
-  pickupAddress      String
-  deliveryAddress    String
-  status             DeliveryStatus    @default(PENDING)
-  arrivalDate        DateTime?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  userId             String
-  currentLatitude    Float?
-  currentLocation    String?
-  currentLongitude   Float?
+  id              String         @id @default(cuid())
+  trackingId      String         @unique @default(uuid())
+  weight          Float
+  senderName      String
+  senderPhone     String
+  receiverName    String
+  receiverPhone   String
+  pickupAddress   String
+  deliveryAddress String
+  status          DeliveryStatus @default(PENDING)
+  arrivalDate     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  userId          String
+
+  currentLatitude  Float?
+  currentLocation  String?
+  currentLongitude Float?
+
+  originLatitude  Float?
+  originLocation  String?
+  originLongitude Float?
+
   currentRouteIndex  Int?
   destinationCountry String
   estimatedArrival   DateTime?

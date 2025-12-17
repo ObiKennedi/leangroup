@@ -39,7 +39,10 @@ interface Receipt {
   routes: RoutePoint[];
 }
 
-// Helper function to calculate distance between two points (Haversine formula)
+/**
+ * Calculate distance between two coordinates using Haversine formula
+ * @returns Distance in kilometers
+ */
 function calculateDistance(
   lat1: number,
   lon1: number,
@@ -52,13 +55,16 @@ function calculateDistance(
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
+/**
+ * Create a new delivery order with routes and tracking
+ */
 export const createOrder = async (
   data: {
     senderName: string;
@@ -78,6 +84,7 @@ export const createOrder = async (
   userId: string
 ) => {
   try {
+    // Validate user
     if (!userId) {
       return {
         success: false,
@@ -85,17 +92,16 @@ export const createOrder = async (
       };
     }
 
-    // Create delivery with enhanced tracking fields in a transaction
-    const result = await db.$transaction(async (tx) => {
-      // Calculate initial coordinates (first route point if available)
-      const initialLat = data.routes && data.routes.length > 0 
-        ? data.routes[0].latitude 
-        : undefined;
-      const initialLon = data.routes && data.routes.length > 0 
-        ? data.routes[0].longitude 
-        : undefined;
+    // Get initial coordinates from first route (if available)
+    const initialLat = data.routes?.[0]?.latitude;
+    const initialLon = data.routes?.[0]?.longitude;
+    const initialLocation = data.routes?.[0]
+      ? `${data.routes[0].cityName || data.routes[0].countryName}, ${data.routes[0].countryName}`
+      : data.pickupAddress;
 
-      // Create the delivery
+    // Create delivery with routes in a transaction
+    const result = await db.$transaction(async (tx) => {
+      // STEP 1: Create the delivery
       const newOrder = await tx.delivery.create({
         data: {
           senderName: data.senderName,
@@ -106,28 +112,32 @@ export const createOrder = async (
           deliveryAddress: data.deliveryAddress,
           weight: data.weight,
           packageDescription: data.packageDescription,
-          statusReason: data.statusReason || "Awaiting package pickup",
+          statusReason: data.statusReason || "Order created. Package at origin, awaiting pickup",
           originCountry: data.originCountry,
           destinationCountry: data.destinationCountry,
-          currentLocation: data.pickupAddress,
+
+          // Initial location data (first checkpoint)
+          currentLocation: initialLocation,
           currentLatitude: initialLat,
           currentLongitude: initialLon,
-          currentRouteIndex: 0,
+          currentRouteIndex: 0, // Start at first checkpoint
+
           estimatedArrival: data.estimatedArrival,
           status: DeliveryStatus.PENDING,
-          transitSpeed: 60, // Default 60 km/h for animation
+          transitSpeed: 60, // Default speed for animation (km/h)
+          lastRouteUpdate: new Date(),
+
           user: {
             connect: { id: userId },
           },
         },
       });
 
-      // Create route points if provided
+      // STEP 2: Create route checkpoints
       if (data.routes && data.routes.length > 0) {
-        // Calculate distances between consecutive route points
         const routesWithDistances = data.routes.map((route, index) => {
+          // Calculate distance from previous checkpoint
           let distanceFromPrevious = 0;
-          
           if (index > 0) {
             const prevRoute = data.routes![index - 1];
             distanceFromPrevious = calculateDistance(
@@ -138,6 +148,8 @@ export const createOrder = async (
             );
           }
 
+          // CRITICAL: All routes start as NOT passed
+          // The route at currentRouteIndex (0) is where we ARE, not where we've BEEN
           return {
             deliveryId: newOrder.id,
             countryCode: route.countryCode,
@@ -146,10 +158,21 @@ export const createOrder = async (
             latitude: route.latitude,
             longitude: route.longitude,
             sequence: index + 1,
-            isPassed: index === 0, // First route is where package starts
+
+            // All checkpoints start as NOT passed
+            isPassed: false,
+
+            // Record arrival time only for the first checkpoint
             passedAt: index === 0 ? new Date() : null,
+            actualArrivalTime: index === 0 ? new Date() : null,
+
             estimatedArrivalTime: route.estimatedArrivalTime,
             distanceFromPrevious: distanceFromPrevious,
+
+            // Checkpoint activity
+            checkpointActivity: index === 0
+              ? `Package received at ${route.cityName || route.countryName}`
+              : null,
           };
         });
 
@@ -158,29 +181,30 @@ export const createOrder = async (
         });
       }
 
-      // Create initial tracking history entry
+      // STEP 3: Create initial tracking history
       await tx.trackingHistory.create({
         data: {
           deliveryId: newOrder.id,
           status: DeliveryStatus.PENDING,
-          location: data.pickupAddress,
+          location: initialLocation,
           countryCode: data.originCountry,
           latitude: initialLat,
           longitude: initialLon,
-          description: data.statusReason || "Order created and awaiting pickup",
+          description: data.statusReason || "Order created. Package at origin, awaiting pickup",
         },
       });
 
       return newOrder;
     });
 
+    // Generate tracking ID
     const trackingId = await generateTrackingId(result.id);
 
     if (!trackingId) {
       throw new Error("Failed to generate tracking ID");
     }
 
-    // Generate receipt data
+    // Generate receipt
     const receipt: Receipt = {
       orderId: result.id,
       trackingId: trackingId,
@@ -207,6 +231,13 @@ export const createOrder = async (
       routes: data.routes || [],
     };
 
+    console.log("✅ Order created successfully:", {
+      orderId: result.id,
+      trackingId: trackingId,
+      currentRouteIndex: result.currentRouteIndex,
+      totalRoutes: data.routes?.length || 0,
+    });
+
     return {
       success: true,
       message: "Order created successfully with live tracking enabled",
@@ -215,7 +246,7 @@ export const createOrder = async (
       receipt,
     };
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error("❌ Error creating order:", error);
     return {
       success: false,
       message: "Failed to create order. Please try again.",

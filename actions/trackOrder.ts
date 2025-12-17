@@ -24,7 +24,7 @@ export const findDeliveryByTrackingId = async (
                 },
                 trackingHistory: {
                     orderBy: { timestamp: "desc" },
-                    take: 10, // Get last 10 tracking updates
+                    take: 10,
                 },
             },
         });
@@ -33,31 +33,33 @@ export const findDeliveryByTrackingId = async (
             return { error: "No delivery found for this Tracking ID." };
         }
 
-        // Find current and next route based on currentRouteIndex
         const currentRouteIndex = delivery.currentRouteIndex ?? 0;
         const currentRoute = delivery.routes[currentRouteIndex] || null;
         const nextRoute = delivery.routes[currentRouteIndex + 1] || null;
 
-        // Calculate progress percentage
         const totalCheckpoints = delivery.routes.length;
-        const passedCheckpoints = delivery.routes.filter(r => r.isPassed).length;
+        const passedCheckpoints = currentRouteIndex;
         const progressPercentage = totalCheckpoints > 0 
             ? Math.round((passedCheckpoints / totalCheckpoints) * 100)
             : 0;
 
-        // Calculate animation progress for IN_TRANSIT status
+        console.log("=== TRACK ORDER DEBUG ===");
+        console.log("Current Route Index:", currentRouteIndex);
+        console.log("Current Route:", currentRoute?.cityName || currentRoute?.countryName);
+        console.log("Passed Checkpoints (should equal currentRouteIndex):", passedCheckpoints);
+        console.log("Total Checkpoints:", totalCheckpoints);
+        console.log("Progress Percentage:", progressPercentage + "%");
+
         let animationProgress = 0;
         if (delivery.status === "IN_TRANSIT" && delivery.lastRouteUpdate && currentRoute && nextRoute) {
             const now = new Date().getTime();
             const lastUpdate = new Date(delivery.lastRouteUpdate).getTime();
-            const timeSinceUpdate = (now - lastUpdate) / 1000 / 60 / 60; // hours
+            const timeSinceUpdate = (now - lastUpdate) / 1000 / 60 / 60; 
             
-            // Calculate distance between current and next route
             const distance = nextRoute.distanceFromPrevious || 0;
             const speed = delivery.transitSpeed || 60; // km/h
             const estimatedTime = distance / speed; // hours
             
-            // Calculate progress (0 to 1)
             animationProgress = Math.min(timeSinceUpdate / estimatedTime, 1);
         }
 
@@ -84,13 +86,11 @@ export const findDeliveryByTrackingId = async (
                 arrivalDate: delivery.arrivalDate?.toISOString() || null,
                 estimatedArrival: delivery.estimatedArrival?.toISOString() || null,
                 
-                // Animation data
                 transitSpeed: delivery.transitSpeed,
                 currentRouteIndex: delivery.currentRouteIndex,
                 lastRouteUpdate: delivery.lastRouteUpdate?.toISOString() || null,
                 animationProgress: animationProgress,
                 
-                // Current location info
                 currentLocation: {
                     name: currentRoute?.cityName || currentRoute?.countryName || delivery.pickupAddress,
                     coordinates: delivery.currentLatitude && delivery.currentLongitude
@@ -111,7 +111,6 @@ export const findDeliveryByTrackingId = async (
                     sequence: currentRoute?.sequence || 0,
                 },
 
-                // Next location info
                 nextLocation: nextRoute
                     ? {
                         name: nextRoute.cityName || nextRoute.countryName,
@@ -137,15 +136,13 @@ export const findDeliveryByTrackingId = async (
                         estimatedArrivalTime: null,
                     },
 
-                // Route progress
                 routeProgress: {
                     totalCheckpoints,
-                    passedCheckpoints,
+                    passedCheckpoints, // This is now currentRouteIndex
                     remainingCheckpoints: totalCheckpoints - passedCheckpoints,
                     progressPercentage,
                 },
 
-                // All routes with enhanced data
                 routes: delivery.routes.map(route => ({
                     id: route.id,
                     countryCode: route.countryCode,
@@ -161,7 +158,6 @@ export const findDeliveryByTrackingId = async (
                     distanceFromPrevious: route.distanceFromPrevious,
                 })),
 
-                // Recent tracking history
                 trackingHistory: delivery.trackingHistory.map(history => ({
                     id: history.id,
                     status: history.status,
