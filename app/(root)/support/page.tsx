@@ -25,8 +25,8 @@ const Support = () => {
                         <MdEmail />
                     </p>
                     <p className="contact-value">
-                        <a href="mailto:support@leangrouplogistics.com">
-                            support@leangrouplogistics.com
+                        <a href="mailto:support@leangrouplogistics.site">
+                            support@leangrouplogistics.site
                         </a>
                     </p>
                 </div>
