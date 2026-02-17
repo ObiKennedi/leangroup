@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CardWrapper } from "./auth/CardWrapper";
 import { findDeliveryByTrackingId } from "@/actions/trackOrder";
 import { DeliveryInfoCard } from "./tracking/DeliveryInfoCard";
@@ -94,18 +94,34 @@ export const TrackingForm = () => {
     const [loading, setLoading] = useState(false);
     const [animatedPosition, setAnimatedPosition] = useState<{ lat: number; lng: number } | null>(null);
 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const currentTrackingIdRef = useRef<string | null>(null);
+
+    // Stable fetch function that doesn't change on re-renders
+    const fetchDelivery = useCallback(async (trackingId: string) => {
+        const response = await findDeliveryByTrackingId({ trackingId });
+        setResult(response);
+        return response;
+    }, []);
+
     const handleAction = async (formData: FormData) => {
+        // Stop any existing polling before starting a new search
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
         setLoading(true);
         setResult(null);
         setAnimatedPosition(null);
 
         const trackingId = String(formData.get("trackingId") || "");
-        const response = await findDeliveryByTrackingId({ trackingId });
+        currentTrackingIdRef.current = trackingId;
 
-        setResult(response);
+        const response = await fetchDelivery(trackingId);
         setLoading(false);
 
-        // Initialize animated position if in transit
+        // Set initial animated position if in transit
         if (response.delivery?.status === "IN_TRANSIT" && response.delivery.currentLocation.coordinates) {
             setAnimatedPosition({
                 lat: response.delivery.currentLocation.coordinates.latitude,
@@ -114,30 +130,48 @@ export const TrackingForm = () => {
         }
     };
 
-    // Animate position for IN_TRANSIT status
+    // Update animated position whenever animationProgress changes — no polling here
     useEffect(() => {
-        if (!result?.delivery || result.delivery.status !== "IN_TRANSIT") return;
-        if (!result.delivery.currentLocation.coordinates || !result.delivery.nextLocation.coordinates) return;
+        const delivery = result?.delivery;
+        if (!delivery || delivery.status !== "IN_TRANSIT") return;
+        if (!delivery.currentLocation.coordinates || !delivery.nextLocation.coordinates) return;
 
-        const current = result.delivery.currentLocation.coordinates;
-        const next = result.delivery.nextLocation.coordinates;
-        const progress = result.delivery.animationProgress;
+        const current = delivery.currentLocation.coordinates;
+        const next = delivery.nextLocation.coordinates;
+        const progress = delivery.animationProgress;
 
-        // Interpolate position
         const lat = current.latitude + (next.latitude - current.latitude) * progress;
         const lng = current.longitude + (next.longitude - current.longitude) * progress;
 
         setAnimatedPosition({ lat, lng });
+    }, [result?.delivery?.animationProgress]);
 
-        // Update every 5 seconds for smooth animation
-        const interval = setInterval(() => {
-            const fd = new FormData();
-            fd.append("trackingId", result.delivery!.trackingId);
-            handleAction(fd);
+    // Polling effect — only depends on status and trackingId, not the full result object
+    useEffect(() => {
+        const delivery = result?.delivery;
+
+        // Clear any existing interval first
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
+        // Only poll when in transit
+        if (!delivery || delivery.status !== "IN_TRANSIT") return;
+
+        const trackingId = delivery.trackingId;
+
+        intervalRef.current = setInterval(() => {
+            fetchDelivery(trackingId);
         }, 5000);
 
-        return () => clearInterval(interval);
-    }, [result]);
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [result?.delivery?.status, result?.delivery?.trackingId, fetchDelivery]);
 
     return (
         <CardWrapper
@@ -168,11 +202,11 @@ export const TrackingForm = () => {
                 {result?.delivery && (
                     <>
                         <DeliveryInfoCard delivery={result.delivery} />
-                        
+
                         {result.delivery.routes.length > 0 && (
-                            <RouteMapCanvas 
-                                delivery={result.delivery} 
-                                animatedPosition={animatedPosition} 
+                            <RouteMapCanvas
+                                delivery={result.delivery}
+                                animatedPosition={animatedPosition}
                             />
                         )}
 

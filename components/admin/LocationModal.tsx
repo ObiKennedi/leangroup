@@ -19,10 +19,10 @@ interface LocationUpdateModalProps {
     onClose?: () => void;
 }
 
-export default function LocationUpdateModal({ 
+export default function LocationUpdateModal({
     orderId,
     onSubmit,
-    onClose 
+    onClose
 }: LocationUpdateModalProps) {
     const [routes, setRoutes] = useState<Route[]>([]);
     const [currentRouteIndex, setCurrentRouteIndex] = useState<number>(0);
@@ -42,9 +42,9 @@ export default function LocationUpdateModal({
         console.log("Fetching order data for:", orderId);
         try {
             const response = await fetch(`/api/orders/${orderId}`);
-            
+
             console.log("Response status:", response.status);
-            
+
             if (!response.ok) {
                 throw new Error("Failed to fetch order data");
             }
@@ -52,7 +52,7 @@ export default function LocationUpdateModal({
             const data = await response.json();
             console.log("Order data received:", data);
             console.log("Routes found:", data.routes?.length || 0);
-            
+
             if (data.routes && data.routes.length > 0) {
                 setRoutes(data.routes);
                 setCurrentRouteIndex(data.currentRouteIndex || 0);
@@ -100,10 +100,10 @@ export default function LocationUpdateModal({
             }
 
             setSuccessMessage(data.message || "Location updated successfully!");
-            
+
             // Call parent onSubmit to refresh data
             onSubmit();
-            
+
             // Close modal after short delay
             setTimeout(() => {
                 if (onClose) {
@@ -121,9 +121,9 @@ export default function LocationUpdateModal({
     const getLocationLabel = (route: Route, index: number) => {
         const location = route.cityName || route.countryName;
         const totalRoutes = routes.length;
-        
+
         let label = `${index + 1}. ${location}`;
-        
+
         if (index === 0) {
             label += " (Pickup Point)";
         } else if (index === totalRoutes - 1) {
@@ -133,27 +133,27 @@ export default function LocationUpdateModal({
         } else {
             label += " (Transit)";
         }
-        
+
         if (route.isPassed) {
             label += " ✓";
         }
-        
+
         if (index === currentRouteIndex) {
             label += " (Current)";
         }
-        
+
         return label;
     };
 
     if (isFetching) {
         return (
             <div className={styles.form}>
-                <div style={{ 
-                    textAlign: 'center', 
+                <div style={{
+                    textAlign: 'center',
                     padding: '40px 20px',
                     color: '#6b7280'
                 }}>
-                    <div style={{ 
+                    <div style={{
                         fontSize: '14px',
                         marginBottom: '8px'
                     }}>
@@ -176,8 +176,8 @@ export default function LocationUpdateModal({
     if (!routes.length) {
         return (
             <div className={styles.form}>
-                <div style={{ 
-                    textAlign: 'center', 
+                <div style={{
+                    textAlign: 'center',
                     padding: '40px 20px',
                     color: '#dc2626',
                     backgroundColor: '#fee2e2',
@@ -196,11 +196,11 @@ export default function LocationUpdateModal({
             </h3>
 
             {error && (
-                <div style={{ 
-                    color: '#dc2626', 
-                    backgroundColor: '#fee2e2', 
-                    padding: '12px', 
-                    borderRadius: '6px', 
+                <div style={{
+                    color: '#dc2626',
+                    backgroundColor: '#fee2e2',
+                    padding: '12px',
+                    borderRadius: '6px',
                     marginBottom: '16px',
                     fontSize: '14px'
                 }}>
@@ -209,11 +209,11 @@ export default function LocationUpdateModal({
             )}
 
             {successMessage && (
-                <div style={{ 
-                    color: '#059669', 
-                    backgroundColor: '#d1fae5', 
-                    padding: '12px', 
-                    borderRadius: '6px', 
+                <div style={{
+                    color: '#059669',
+                    backgroundColor: '#d1fae5',
+                    padding: '12px',
+                    borderRadius: '6px',
                     marginBottom: '16px',
                     fontSize: '14px'
                 }}>
@@ -248,10 +248,10 @@ export default function LocationUpdateModal({
                         </option>
                     ))}
                 </select>
-                <p style={{ 
-                    fontSize: '12px', 
-                    color: '#6b7280', 
-                    marginTop: '8px' 
+                <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    marginTop: '8px'
                 }}>
                     Current location: {routes[currentRouteIndex]?.cityName || routes[currentRouteIndex]?.countryName}
                 </p>
@@ -279,34 +279,34 @@ export default function LocationUpdateModal({
                         opacity: isLoading ? 0.6 : 1
                     }}
                 />
-                <p style={{ 
-                    fontSize: '12px', 
-                    color: '#6b7280', 
-                    marginTop: '8px' 
+                <p style={{
+                    fontSize: '12px',
+                    color: '#6b7280',
+                    marginTop: '8px'
                 }}>
                     Leave empty to use the default status reason
                 </p>
             </div>
 
-            <div style={{ 
-                marginTop: '20px', 
-                padding: '12px', 
-                backgroundColor: '#f3f4f6', 
+            <div style={{
+                marginTop: '20px',
+                padding: '12px',
+                backgroundColor: '#f3f4f6',
                 borderRadius: '6px',
                 fontSize: '13px',
                 color: '#4b5563'
             }}>
-                <strong>Note:</strong> Updating the location will automatically update the delivery status, 
+                <strong>Note:</strong> Updating the location will automatically update the delivery status,
                 tracking history, and mark all previous checkpoints as passed.
             </div>
 
-            <div style={{ 
-                display: 'flex', 
-                gap: '12px', 
-                marginTop: '24px' 
+            <div style={{
+                display: 'flex',
+                gap: '12px',
+                marginTop: '24px'
             }}>
-                <button 
-                    className={styles.submitBtn} 
+                <button
+                    className={styles.submitBtn}
                     onClick={handleSubmit}
                     disabled={isLoading || selectedRouteIndex === currentRouteIndex}
                     style={{
@@ -317,9 +317,9 @@ export default function LocationUpdateModal({
                 >
                     {isLoading ? "Updating..." : "Update Location"}
                 </button>
-                
+
                 {onClose && (
-                    <button 
+                    <button
                         onClick={onClose}
                         disabled={isLoading}
                         style={{
