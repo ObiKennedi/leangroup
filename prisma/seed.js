@@ -10,7 +10,7 @@ async function main() {
   const hashedPassword = await hash(password, 10);
 
   const admin = await db.user.upsert({
-    where: { email: "admin@nextpath.com" },
+    where: { email: "admin@leangroup.com" },
     update: {},
     create: {
       name: "LeanGroup Admin",

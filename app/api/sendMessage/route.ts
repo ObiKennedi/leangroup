@@ -1,31 +1,68 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
+import { pusherServer } from "@/lib/pusher-server"
+import { sendTelegramAlert } from "@/lib/telegram"
+import { auth } from "@/auth"
 
-export async function POST(req: Request) {
-  try {
-    const { message } = await req.json();
-
-    if (!message) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
-    }
-
-    // Replace with your own bot token + chat ID
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
-
-    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-    await fetch(telegramUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-        parse_mode: "HTML",
-      }),
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    return NextResponse.json({ error: "Failed to send" }, { status: 500 });
+export async function POST(req: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
+
+  const { message } = await req.json()
+  if (!message?.trim()) {
+    return NextResponse.json({ error: "Empty message" }, { status: 400 })
+  }
+
+  const userId = session.user.id
+  const userName = session.user.name || "A user"
+
+  // Get or create chat session
+  let chatSession = await db.chatSession.findFirst({ where: { userId } })
+  if (!chatSession) {
+    chatSession = await db.chatSession.create({ data: { userId } })
+  }
+
+  // Store message
+  const chatMessage = await db.chatMessage.create({
+    data: {
+      sessionId: chatSession.id,
+      sender: "user",
+      text: message.trim(),
+    },
+  })
+
+  // Update session updatedAt so it bubbles to top
+  await db.chatSession.update({
+    where: { id: chatSession.id },
+    data: { updatedAt: new Date() },
+  })
+
+  // Push to user's own channel (so their UI updates)
+  await pusherServer.trigger(`chat-${userId}`, "new-message", {
+    sender: "user",
+    text: message.trim(),
+    createdAt: chatMessage.createdAt,
+  })
+
+  // Push to admin channel (so admin UI updates in real time)
+  await pusherServer.trigger("admin-chat", "new-message", {
+    userId,
+    userName,
+    sessionId: chatSession.id,
+    sender: "user",
+    text: message.trim(),
+    createdAt: chatMessage.createdAt,
+  })
+
+  // Telegram alert — only on first message or if admin hasn't replied yet
+  const isFirstMessage = await db.chatMessage.count({
+    where: { sessionId: chatSession.id },
+  })
+  if (isFirstMessage === 1) {
+    await sendTelegramAlert(userName, message.trim())
+  }
+
+  return NextResponse.json({ success: true })
 }

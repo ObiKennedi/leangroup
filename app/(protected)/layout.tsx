@@ -1,11 +1,14 @@
 import { BottomNav } from "@/components/BottomNav"
 import "@/styles/Settings.scss"
+import { Providers } from "@/components/Providers"
 
-const ProtectedLayout = ({children}: {children: React.ReactNode}) =>{
-    return(
+const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
+    return (
         <>
-            {children}
-            <BottomNav/>
+            <Providers>
+                {children}
+            </Providers>
+            <BottomNav />
         </>
     )
 }

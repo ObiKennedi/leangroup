@@ -2,11 +2,12 @@
 
 import * as z from "zod"
 import bcrypt from "bcryptjs"
-import { redirect } from "next/navigation" // Import for redirection
+import { redirect } from "next/navigation"
 
 import { db } from "@/lib/db"
 import { RegisterSchema } from "@/schema"
 import { getUserByEmail } from "@/data/user"
+import { generateOTP } from "./otp"
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values)
@@ -33,5 +34,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     },
   })
 
-  redirect("/auth/login")
+  await generateOTP(email)
+
+  redirect(`/verify-otp?email=${encodeURIComponent(email)}`)
 }

@@ -10,28 +10,28 @@ const bottomNavLinks = [
     {
         id: 1,
         name: "Dashboard",
-        icon: <LayoutDashboard/>,
+        icon: <LayoutDashboard />,
         href: "/dashboard"
     },
     {
         id: 2,
         name: "Profile",
-        icon: <User/>,
+        icon: <User />,
         href: "/settings"
     },
     {
         id: 3,
         name: "Chat",
-        icon: <MessageCircle/>,
+        icon: <MessageCircle />,
         href: "/chat"
     },
 ]
 
-export const BottomNav = () =>{
-    return(
+export const BottomNav = () => {
+    return (
         <nav className="bottom-nav">
             <ul>
-                {bottomNavLinks.map((item)=>(
+                {bottomNavLinks.map((item) => (
                     <li key={item.id}>
                         <a href={item.href}>
                             {item.icon}

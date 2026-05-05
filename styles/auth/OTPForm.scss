@@ -1,0 +1,74 @@
+.otp-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  .otp-box {
+    width: 52px;
+    height: 60px;
+    border-radius: 14px;
+    border: 1px solid var(--lg-soft-black);
+    background: transparent;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    caret-color: var(--lg-gold);
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus-visible {
+      outline: none;
+      border: 1px solid var(--lg-gold);
+      box-shadow: 0 0 0 3px rgba(215, 177, 95, 0.15);
+    }
+
+    &.filled {
+      border-color: var(--lg-gold);
+      color: var(--lg-gold);
+    }
+
+    @media (max-width: 470px) {
+      width: 42px;
+      height: 52px;
+      font-size: 1.3rem;
+      border-radius: 10px;
+    }
+  }
+}
+
+.resend-container {
+  text-align: center;
+  margin-top: -8px;
+
+  .resend-timer {
+    font-size: 13px;
+    color: #aaaaaa;
+    font-weight: 500;
+
+    span {
+      color: var(--lg-gold);
+      font-weight: 700;
+    }
+  }
+
+  .resend-btn {
+    background: transparent;
+    border: none;
+    color: var(--lg-gold);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.75;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
