@@ -94,8 +94,12 @@ export const OTPForm = () => {
 
     startTransition(() => {
       resendOTP(email).then((data) => {
-        if (data?.error) setError(data.error)
-        else setSuccess("A new OTP has been sent to your email.")
+        // Use 'in' operator to check if error exists on the object
+        if (data && "error" in data) {
+          setError(data.error)
+        } else if (data && "success" in data) {
+          setSuccess("A new OTP has been sent to your email.")
+        }
       })
     })
   }
