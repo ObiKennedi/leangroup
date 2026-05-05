@@ -100,7 +100,7 @@ export const AdminChatRoom = ({ sessionId }: { sessionId: string }) => {
     return (
         <main className="admin-chat-room">
             <div className="room-header">
-                <button className="back-btn" onClick={() => router.push("/admin/chats")}>
+                <button className="back-btn" onClick={() => router.push("/admin-chats")}>
                     <ArrowLeft size={20} />
                 </button>
                 <div className="room-user-info">
