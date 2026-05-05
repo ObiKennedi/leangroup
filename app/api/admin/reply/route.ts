@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { pusherServer } from "@/lib/pusher"
+import { pusherServer } from "@/lib/pusher-server"
 import { auth } from "@/auth"
 
 export async function POST(req: NextRequest) {
