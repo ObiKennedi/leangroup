@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { DeliveryStatus } from "@prisma/client";
+import { DeliveryStatus } from "@/prisma/generated/client";
 
 function getCheckpointActivity(routeIndex: number, totalRoutes: number, cityName: string | null, countryName: string): string {
     if (routeIndex === 0) {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         const totalRoutes = routes.length;
 
         let newStatus: DeliveryStatus;
-        
+
         if (newRouteIndex === 0) {
             newStatus = DeliveryStatus.PICKED_UP;
         } else if (newRouteIndex === totalRoutes - 1) {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
         await db.$transaction(async (tx) => {
             console.log("→ Resetting all routes...");
-            
+
             // Reset all routes
             for (const route of routes) {
                 await tx.route.update({
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
                     }
                 });
             }
-            
+
             console.log("→ Marking passed routes...");
 
             // Mark routes before current as passed
@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
         console.log("Expected currentRouteIndex:", newRouteIndex);
         console.log("Match?", verifiedOrder?.currentRouteIndex === newRouteIndex ? "✅ YES" : "❌ NO");
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             success: true,
             message: `Location updated to ${newRoute.cityName || newRoute.countryName}`,
             status: newStatus,
@@ -191,7 +191,7 @@ export async function POST(req: NextRequest) {
         });
     } catch (error) {
         console.error("💥 ERROR:", error);
-        return NextResponse.json({ 
+        return NextResponse.json({
             error: "Failed to update location",
             details: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
