@@ -2,19 +2,29 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { auth } from "@/auth"
 
+// 1. Update the type definition: params is now a Promise
 export async function GET(
     req: NextRequest,
-    { params }: { params: { sessionId: string } }
+    { params }: { params: Promise<{ sessionId: string }> }
 ) {
     const session = await auth()
+
     if (!session?.user || session.user.role !== "ADMIN") {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const messages = await db.chatMessage.findMany({
-        where: { sessionId: params.sessionId },
-        orderBy: { createdAt: "asc" },
-    })
+    // 2. Await the params to get the sessionId
+    const { sessionId } = await params
 
-    return NextResponse.json(messages)
+    try {
+        const messages = await db.chatMessage.findMany({
+            where: { sessionId: sessionId },
+            orderBy: { createdAt: "asc" },
+        })
+
+        return NextResponse.json(messages)
+    } catch (error) {
+        console.error("Database error:", error)
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    }
 }
