@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { DeliveryStatus } from "@prisma/client";
+import { DeliveryStatus } from "@/prisma/generated/client";
 
 interface RoutePoint {
   countryCode: string;
@@ -338,14 +338,14 @@ export const updateCurrentLocation = async (
     return { success: true, order: result };
   } catch (error) {
     console.error("Error updating location:", error);
-    
+
     if (error && typeof error === 'object' && 'code' in error) {
       const prismaError = error as { code: string };
       if (prismaError.code === 'P2028') {
         return { success: false, error: "Database transaction timeout. Please try again." };
       }
     }
-    
+
     return { success: false, error: "Failed to update location" };
   }
 };

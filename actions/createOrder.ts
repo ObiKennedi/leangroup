@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { generateTrackingId } from "@/lib/trackingId";
-import { DeliveryStatus } from "@prisma/client";
+import { DeliveryStatus } from "@/prisma/generated/client";
 
 interface RoutePoint {
   countryCode: string;

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { DeliveryStatus } from "@prisma/client";
+import { DeliveryStatus } from "@/prisma/generated/client";
 
 export const getOrderById = async (id: string) => {
     try {
