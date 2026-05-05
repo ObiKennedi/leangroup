@@ -1,13 +1,23 @@
 import { PrismaClient } from '@/prisma/generated/client'
+import { PrismaNeon } from '@prisma/adapter-neon'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
+const adapter = new PrismaNeon({
+  connectionString: process.env.DATABASE_URL!,
+})
+
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    adapter,
+    log: process.env.NODE_ENV === 'development'
+      ? ['error', 'warn']
+      : ['error'],
   })
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = db
+}
