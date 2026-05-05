@@ -3,7 +3,7 @@ import { AdminChatList } from "@/components/admin/chat/AdminChatList"
 
 const AdminChatsPage = () => {
     return (
-        <Suspense>
+        <Suspense fallback={<h1>Loading...</h1>}>
             <AdminChatList />
         </Suspense>
     )

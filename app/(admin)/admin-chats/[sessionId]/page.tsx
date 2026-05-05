@@ -1,10 +1,17 @@
 import { Suspense } from "react"
 import { AdminChatRoom } from "@/components/admin/chat/AdminChatRoom"
 
-const AdminChatRoomPage = ({ params }: { params: { sessionId: string } }) => {
+interface PageProps {
+    params: Promise<{ sessionId: string }>;
+}
+
+const AdminChatRoomPage = async ({ params }: PageProps) => {
+
+    const { sessionId } = await params;
+
     return (
-        <Suspense>
-            <AdminChatRoom sessionId={params.sessionId} />
+        <Suspense fallback={<h1>Loading...</h1>}>
+            <AdminChatRoom sessionId={sessionId} />
         </Suspense>
     )
 }
