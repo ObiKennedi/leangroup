@@ -5,17 +5,19 @@ import { Testimonials } from "@/components/landing-page/Testimony"
 import { ValueProps } from "@/components/landing-page/ValueProps"
 import { Vision } from "@/components/landing-page/Vision"
 import { Services } from "@/components/Services"
+import WhatsAppFloat from "../../components/WhatsAppFloat"
 
-const HomePage = () =>{
-    return(
+const HomePage = () => {
+    return (
         <main>
-            <HeroSection/>
-            <ValueProps/>
-            <Services/>
-            <HowItWorks/>
-            <Vision/>
-            <Testimonials/>
-            <ContactForm/>
+            <HeroSection />
+            <ValueProps />
+            <Services />
+            <HowItWorks />
+            <Vision />
+            <Testimonials />
+            <ContactForm />
+            <WhatsAppFloat />
         </main>
     )
 }
